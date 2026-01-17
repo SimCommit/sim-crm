@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { User } from '../../models/user.data';
 import { form, FormField, maxLength, minLength, required, validate } from '@angular/forms/signals';
+import { UserDataService } from '../shared/services/user-data.service';
 
 @Component({
   selector: 'app-dialog-add-user',
@@ -27,6 +28,8 @@ import { form, FormField, maxLength, minLength, required, validate } from '@angu
   styleUrl: './dialog-add-user.scss',
 })
 export class DialogAddUser {
+  public userDataService = inject(UserDataService);
+
   public user = signal<User>({
     firstName: '',
     lastName: '',
@@ -60,8 +63,11 @@ export class DialogAddUser {
 
   constructor() {}
 
-  public saveUser(): void {
+  saveUser(): void {
     this.user().birthDate = this.birthDate.getTime();
+    
     console.log('user', this.user());
+
+    this.userDataService.saveUser(this.user());
   }
 }
