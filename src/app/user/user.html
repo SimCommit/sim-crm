@@ -1,5 +1,23 @@
-<h1>user works!</h1>
+<h1>User</h1>
 
-<button (click)="openDialog()" matFab class="add-user-btn" aria-label="Add user" matTooltip="Add User" [matTooltipPosition]="'above'">
+<mat-card class="example-card" appearance="outlined">
+    <mat-card-content>
+        <table class="full-width user-table">
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>City</th>
+            </tr>
+            <tr>
+                <td>Großhans</td>
+                <td>the-great@hans.de</td>
+                <td>Munich</td>
+            </tr>
+        </table>
+    </mat-card-content>
+</mat-card>
+
+<button (click)="openDialog()" matFab class="add-user-btn" aria-label="Add user" matTooltip="Add User"
+    [matTooltipPosition]="'above'">
     <mat-icon>add</mat-icon>
 </button>
