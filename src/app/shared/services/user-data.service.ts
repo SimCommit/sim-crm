@@ -9,13 +9,10 @@ export class UserDataService {
   private firestore = inject(Firestore);
   private injector = inject(Injector);
 
-  public loading = signal(false);
-
-  // anstat async mit finally (tritt auch im error fall ein) "awaited"
-  saveUser(user: User): void {
-    this.loading.set(true);
-    runInInjectionContext(this.injector, () => {
-      addDoc(this.getUserRef(), user).finally( () => this.loading.set(false));
+  // await und async vor allen relevanten Funktionsteilen
+  async addUser(user: User): Promise<void> {
+    await runInInjectionContext(this.injector, async () => {
+      await addDoc(this.getUserRef(), user);
     });
   }
 

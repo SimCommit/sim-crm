@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatDialogContent, MatDialogActions } from '@angular/material/dialog';
+import { MatDialogContent, MatDialogActions, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
@@ -31,7 +31,13 @@ import { MatProgressBar } from '@angular/material/progress-bar';
 })
 export class DialogAddUser {
   public userDataService = inject(UserDataService);
+  public dialogRef = inject(MatDialogRef<DialogAddUser>);
 
+  // signal that is true, while firestore operation is in progress
+  public loading = signal(false);
+
+  // Anstatt einer Class die Junus vorschlägt,
+  // benutze ich ein Signal für den anzulegenden User
   public user = signal<User>({
     firstName: '',
     lastName: '',
@@ -48,9 +54,9 @@ export class DialogAddUser {
     required(schemaPath.firstName, { message: 'First name is required' });
     required(schemaPath.lastName, { message: 'Last name is required' });
     required(schemaPath.birthDate, { message: 'Birth date is required' });
-    required(schemaPath.street, { message: 'Street is required'  });
-    required(schemaPath.zipCode, { message: 'Zip code is required'  });
-    required(schemaPath.city, { message: 'City is required'  });
+    required(schemaPath.street, { message: 'Street is required' });
+    required(schemaPath.zipCode, { message: 'Zip code is required' });
+    required(schemaPath.city, { message: 'City is required' });
     maxLength(schemaPath.zipCode, 5, { message: 'Zip code must be five numbers' });
     validate(schemaPath.zipCode, ({ value }) => {
       if (!/^([0-9]{5,})$/.test(value())) {
@@ -59,19 +65,24 @@ export class DialogAddUser {
           message: 'Zip code must be five numbers',
         };
       }
-      
+
       return null;
     });
-    disabled(schemaPath, () => this.userDataService.loading());
+    disabled(schemaPath, () => this.loading());
   });
 
   constructor() {}
 
-  saveUser(): void {
+  // wandelt birthDate in eine number um
+  // und speichert den neuen User über den Service in Firestore
+  async saveUser(): Promise<void> {
+    this.loading.set(true);
     this.user().birthDate = this.birthDate.getTime();
-
+    
     console.log('user', this.user());
-
-    this.userDataService.saveUser(this.user());
+    
+    await this.userDataService.addUser(this.user());
+    this.loading.set(false);
+    this.dialogRef.close();
   }
 }
