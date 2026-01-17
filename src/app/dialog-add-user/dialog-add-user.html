@@ -1,3 +1,7 @@
+@if (userDataService.loading()) {
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
 <h2 mat-dialog-title>Add User</h2>
 <mat-dialog-content>
     <div class="mb-16">
@@ -25,8 +29,10 @@
     <div class="mb-16">
         <mat-form-field class="full-width" appearance="outline">
             <mat-label>Choose a date</mat-label>
-            <input [(ngModel)]="birthDate" matInput [matDatepicker]="picker">
+            <input [disabled]="userDataService.loading()" [(ngModel)]="birthDate" matInput [matDatepicker]="picker">
+            @if (!userDataService.loading()) {
             <mat-hint>MM/DD/YYYY</mat-hint>
+            }
             <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
@@ -70,6 +76,6 @@
 
 </mat-dialog-content>
 <mat-dialog-actions>
-    <button matButton>Cancel</button>
-    <button matButton cdkFocusInitial (click)="saveUser()">Save</button>
+    <button [disabled]="userDataService.loading()" matButton>Cancel</button>
+    <button [disabled]="userDataService.loading()" matButton cdkFocusInitial (click)="saveUser()">Save</button>
 </mat-dialog-actions>

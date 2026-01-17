@@ -7,8 +7,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { User } from '../../models/user.data';
-import { form, FormField, maxLength, minLength, required, validate } from '@angular/forms/signals';
+import { disabled, form, FormField, maxLength, required, validate } from '@angular/forms/signals';
 import { UserDataService } from '../shared/services/user-data.service';
+import { MatProgressBar } from '@angular/material/progress-bar';
 
 @Component({
   selector: 'app-dialog-add-user',
@@ -21,6 +22,7 @@ import { UserDataService } from '../shared/services/user-data.service';
     MatButton,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatProgressBar,
     FormsModule,
     FormField,
   ],
@@ -41,6 +43,7 @@ export class DialogAddUser {
 
   public birthDate: Date = new Date('1-1-1970');
 
+  // signal forms way to handle validation
   public userForm = form(this.user, (schemaPath) => {
     required(schemaPath.firstName, { message: 'First name is required' });
     required(schemaPath.lastName, { message: 'Last name is required' });
@@ -56,16 +59,17 @@ export class DialogAddUser {
           message: 'Zip code must be five numbers',
         };
       }
-
+      
       return null;
     });
+    disabled(schemaPath, () => this.userDataService.loading());
   });
 
   constructor() {}
 
   saveUser(): void {
     this.user().birthDate = this.birthDate.getTime();
-    
+
     console.log('user', this.user());
 
     this.userDataService.saveUser(this.user());

@@ -1,4 +1,4 @@
-import { inject, Injectable, Injector, runInInjectionContext } from '@angular/core';
+import { inject, Injectable, Injector, runInInjectionContext, signal } from '@angular/core';
 import { addDoc, collection, Firestore } from '@angular/fire/firestore';
 import { User } from '../../../models/user.data';
 
@@ -9,11 +9,14 @@ export class UserDataService {
   private firestore = inject(Firestore);
   private injector = inject(Injector);
 
-  saveUser(user: User) {
+  public loading = signal(false);
+
+  // anstat async mit finally (tritt auch im error fall ein) "awaited"
+  saveUser(user: User): void {
+    this.loading.set(true);
     runInInjectionContext(this.injector, () => {
-      addDoc(this.getUserRef(), user);
+      addDoc(this.getUserRef(), user).finally( () => this.loading.set(false));
     });
-    console.log('Finished adding user');
   }
 
   getUserRef() {
